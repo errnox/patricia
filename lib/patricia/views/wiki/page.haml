@@ -1,0 +1,78 @@
+%br
+%div.container
+  %div.row
+    %div.col.col-md-7.col-md-offset-1
+      %div.row.panel.panel-default.panel-body.top-panel
+        %div.col.col-md-9
+          %p.row
+            %strong
+              %a{:href => "/"}= @title if defined?(@title)
+        %div.col.col-md-3
+          %p.text-right
+            %a.text-muted.small#p-page-search-link{:href => "/patricia/search"} Search pages >
+        %div.row
+          %div.col.col-md-12.page-title
+            %span.text-muted= @breadcrumb
+            = @page_title if defined?(@page_title)
+
+      %div.row#content
+        = preserve do
+          = @html if defined?(@html)
+      %hr
+      - if defined?(@markup_url)
+        %p.text-center
+          %small
+            %a.text-muted{:href => "#{@markup_url}"} Markup for this page
+    %div.col.col-md-3.col-md-offset-1.well#p-sidebar
+      %input.form-control#p-sidebar-search-box{:type => 'text', :placeholder => 'Search'}
+      %p.text-right
+        %a.btn.btn-link.btn-xs#p-sidebar-width-toggle{:href => ''} Widen sidebar
+      %br
+      - if defined?(@toc)
+        %div#toc
+          = @toc
+- if defined?(@markup_url)
+  %a.hidden#edit-button{:href => "/patricia/offsets", 'data-markup-url' => "#{@markup_url}"} Edit
+  %a.hidden#left-edit-button.btn.btn-default{:href => "/patricia/offsets", 'data-markup-url' => "#{@markup_url}"} Edit
+
+%div.modal.fade#edit-modal{:tabindex => '-1', :role => 'dialog'}
+  %div.modal-dialog.modal-lg
+    %div.modal-content
+      %div.modal-header
+        %button.close{:type => 'button', 'data-dismiss' => 'modal', 'aria-hidden' => 'true'} &times;
+        %h4.no-style.modal-title Edit Page Markup
+      %div.modal-body
+        %pre#currently-selected-text-info{:title => 'Selected text', 'data-toggle' => 'tooltip', 'data-placement' => 'top'}
+        - if defined?(@ace) && @ace
+
+          - if defined?(@ace_theme)
+            %div#ace-editor-theme{'data-theme' => @ace_theme}
+          - else
+            %div#ace-editor-theme{'data-theme' => 'chrome'}
+
+          - if defined?(@ace_keybinding)
+            %div#ace-editor-keybinding{'data-keybinding' => @ace_keybinding}
+          - else
+            %div#ace-editor-keybinding{'data-keybinding' => 'normal'}
+
+          - if defined?(@ace_mode)
+            %div#ace-editor-mode{'data-mode' => @ace_mode}
+          - else
+            %div#ace-editor-mode{'data-mode' => 'plain_text'}
+
+          %div#ace-editor
+        - else
+          %textarea#editor.form-control{:rows => 15, :cols => 100}
+        %div.container#edit-navigation-box
+          %div.row
+            %br
+            %div.col-md-2.col-md-offset-3
+              %a#previous-match-button.btn.btn-default.btn-block{:href => '#'} < Previous match
+            %div.col-md-1
+              %span#current-offset-index
+              %span#offsets-length
+            %div.col-md-2
+              %a#next-match-button.btn.btn-default.btn-block{:href => '#'} Next match >
+      %div.modal-footer
+        %button.btn.btn-default{:type => 'button', 'data-dismiss' => 'modal'} Cancel
+        %button.btn.btn-primary#edit-save-button{:type => 'button', 'data-dismiss' => 'modal', 'data-url' => '/patricia/edit'} Save

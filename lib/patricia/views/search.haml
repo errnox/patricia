@@ -1,0 +1,62 @@
+%div.container
+  %br
+  %a.text-muted.small{:href => '/'} < Home
+  %div.panel.panel-default.page-header
+    %div.row.panel-body
+      %div.text-center
+        %h1 Search Pages
+      %br
+      %div.container
+        %form.col.col-md-8.col-md-offset-2{:method => 'post', :action => '/patricia/search'}
+          %div.well.row
+            %div.col.col-md-10
+              %input.form-control{:type => 'text', :name => 'search_query', :placeholder => 'Search', :value => "#{@previous_search_query}"}
+            %div.col.col-md-2
+              %button.form-control.btn.btn-default{:type => 'submit'} OK
+          %div.text-right
+            %label
+              - if @previous_search_query_was_sensitive
+                %input{:type => 'checkbox', :name => 'case_sensitive', :checked => ''}
+              - else
+                %input{:type => 'checkbox', :name => 'case_sensitive'}
+              Case sensitive
+
+  - if defined?(@results)
+    %div.container
+      %div.row.col.col-md-8.col-md-offset-2
+        %div.row
+          %br
+          %div.col.col-md-10
+            - if defined?(@previous_search_query)
+              %p
+                Search results for
+                "
+                %strong= @previous_search_query
+                "
+                - if @previous_search_query_was_sensitive
+                  (case sensitive)
+                - else
+                  (case insensitive)
+          %div.col.col-md-2
+            %p.text-right.text-muted
+              = @results.length
+              results
+        - if @results.empty?
+          %hr
+          %p.text-center
+            %em No pages found
+        %div.list-group
+          - @results.each_with_index do |result, i|
+            %a.list-group-item{:href => "#{result[1]}"}
+              %div.row
+                %div.col.col-md-10
+                  %h2.no-style= result[0]
+                  %p.text-muted= result[2]
+                %div.col.col-md-2
+                  %p.text-right.text-muted
+                    %span.row.small
+                      = i + 1
+                      \.
+                    %em.row
+                      = result[3]
+                      lines

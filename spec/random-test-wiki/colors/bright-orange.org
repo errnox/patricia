@@ -1,0 +1,19 @@
+* TODO Orange
+
+37ed608c-7c67-4a48-99ae-d351b576269d
+
+This is *orange*.
+
+** Info						     :info:knowledge:diverse:
+
+Orange is a bright color.
+
+** Code						    :code:source:programming:
+
+#+begin_src ruby
+class Cloud
+  def rain(intensity)
+    puts "Raining with intensity #{speed}"
+  end
+end
+#+end_src

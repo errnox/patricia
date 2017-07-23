@@ -1,0 +1,18 @@
+!!! html
+%html
+  %head
+    - if @stylesheets.nil? || @stylesheets.empty?
+      %link{:href => '/patricia.css', :rel => 'stylesheet', :type => 'text/css'}
+    - else
+      - @stylesheets.each do |path|
+        %link{:href => "#{path}", :rel => 'stylesheet', :type => 'text/css'}
+    %meta{:charset => 'utf-8'}
+    %base{:href => '/', :target => '_self'}
+  %body
+
+    = yield
+    - if @javascripts.nil? || @javascripts.empty?
+      %script{:type => 'text/javascript', :src => '/patricia.js'}
+    - else
+      - @javascripts.each do |path|
+        %script{:type => 'text/javascript', :src => "#{path}"}

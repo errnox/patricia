@@ -1,0 +1,62 @@
+#!/usr/bin/env ruby
+
+
+require 'rack'
+require 'rack/static'
+require 'yaml'
+require_relative '../lib/patricia'
+
+
+config = {
+  :css_dir => CLI.options[:css],
+  :js_dir => CLI.options[:js],
+  :markup_dir => CLI.options[:markup_dir],
+  :tooltips => CLI.options[:tooltips],
+  :editor => CLI.options[:editor],
+  :gfm => CLI.options[:gfm],
+  :ace => CLI.options[:ace],
+  :ace_theme => CLI.options[:ace_theme],
+  :ace_keybinding => CLI.options[:ace_keybinding],
+  :ace_mode => CLI.options[:ace_mode],
+}
+config_file = File.dirname(__FILE__) + '/app_config.yml'
+# The thread ensures that the config file is written before the Sinatra app
+# starts.
+config_writer = Thread.new do
+  begin
+    File.delete(config_file)
+  rescue
+    # Ignore.
+  end
+  File.open(config_file, 'w') do |f|
+    f.write(config.to_yaml)
+  end
+end
+
+# Wait for the config file to be written.
+config_writer.join
+
+if CLI.options[:output_dir]
+  css_dir = CLI.options[:css]
+  js_dir = CLI.options[:js]
+  css = Dir[css_dir + '/**/*.css'].collect { |x| x.sub(/#{css_dir}/, '') }
+  js = Dir[js_dir + '/**/*.js'].collect { |x| x.sub(/#{js_dir}/, '') }
+  patricia = Patricia::Wiki.new(CLI.options[:markup_dir], :output_dir =>
+                                CLI.options[:output_dir], :css =>
+                                css, :js => js)
+  patricia.render
+else
+  require_relative '../lib/patricia/app'
+  app = Rack::Builder.new do
+    if config[:ace]
+      use Rack::Static, :urls =>
+        [%r{/theme-.*\.js}, %r{/mode-.*\.js}, %r{/worker-.*\.js},
+         %r{/keybinding-.*\.js}, %r{/ext-.*\.js}], :root =>
+        File.expand_path("../../lib/patricia/assets/javascripts/\
+src-min-noconflict", __FILE__)
+    end
+    use PatriciaApp::App
+    run Proc.new { |env| [404, {'Content-Type' => 'text/html'}, ['404']] }
+  end
+  Rack::Handler::WEBrick.run app, :Port => CLI.options[:port] || 4321
+end
